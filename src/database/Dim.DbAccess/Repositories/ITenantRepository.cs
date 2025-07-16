@@ -35,7 +35,7 @@ public interface ITenantRepository
     Task<(string? BaseUrl, WalletData WalletData)> GetCompanyRequestData(Guid tenantId);
     Task<(bool Exists, Guid? CompanyId, string? BaseUrl, WalletData WalletData)> GetCompanyAndWalletDataForBpn(string bpn);
     Task<(Guid? CompanyId, string? BaseUrl, WalletData WalletData)> GetStatusListCreationData(Guid tenantId);
-    Task<(string Bpn, string? BaseUrl, WalletData WalletData, string? Did, string? DownloadUrl)> GetCallbackData(Guid tenantId);
+    Task<(string Bpn, Guid? CompanyId, string? BaseUrl, WalletData WalletData, string? Did, string? DownloadUrl)> GetCallbackData(Guid tenantId);
     Task<(string? DownloadUrl, bool IsIssuer)> GetDownloadUrlAndIsIssuer(Guid tenantId);
     Task<ProcessData?> GetWalletProcessForTenant(string bpn, string companyName);
 }

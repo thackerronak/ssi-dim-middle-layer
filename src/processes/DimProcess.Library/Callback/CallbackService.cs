@@ -23,6 +23,7 @@ using DimProcess.Library.Callback.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Org.Eclipse.TractusX.Portal.Backend.Framework.HttpClientExtensions;
 using Org.Eclipse.TractusX.Portal.Backend.Framework.Token;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -42,8 +43,12 @@ public class CallbackService(ITokenService tokenService, IOptions<CallbackSettin
             didDocument,
             authenticationDetail
         );
+        ValueTask<(bool, string?)> CustomErrorHandling(HttpResponseMessage errorResponse) => new(
+          (errorResponse.StatusCode == HttpStatusCode.Conflict,
+          null));
+
         await httpClient.PostAsJsonAsync($"/api/administration/registration/dim/{bpn}", data, JsonSerializerExtensions.Options, cancellationToken)
-                .CatchingIntoServiceExceptionFor("send-callback", HttpAsyncResponseMessageExtension.RecoverOptions.INFRASTRUCTURE)
+                .CatchingIntoServiceExceptionFor("send-callback", HttpAsyncResponseMessageExtension.RecoverOptions.INFRASTRUCTURE, CustomErrorHandling)
                 .ConfigureAwait(false);
     }
 

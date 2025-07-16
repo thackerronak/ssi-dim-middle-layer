@@ -402,7 +402,7 @@ public class DimProcessHandlerTests
     {
         // Arrange
         A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", null, _fixture.Create<WalletData>(), null, null));
+            .Returns(("bpn123", Guid.NewGuid(), null, _fixture.Create<WalletData>(), null, null));
         async Task Act() => await _sut.SendCallback(_tenantId, CancellationToken.None);
 
         // Act
@@ -417,7 +417,7 @@ public class DimProcessHandlerTests
     {
         // Arrange
         A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", "https://example.org/base", _fixture.Create<WalletData>(), null, null));
+            .Returns(("bpn123", Guid.NewGuid(), "https://example.org/base", _fixture.Create<WalletData>(), null, null));
         async Task Act() => await _sut.SendCallback(_tenantId, CancellationToken.None);
 
         // Act
@@ -432,7 +432,7 @@ public class DimProcessHandlerTests
     {
         // Arrange
         A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", "https://example.org/base", _fixture.Create<WalletData>(), "did:web:example:org:base", null));
+            .Returns(("bpn123", Guid.NewGuid(), "https://example.org/base", _fixture.Create<WalletData>(), "did:web:example:org:base", null));
         async Task Act() => await _sut.SendCallback(_tenantId, CancellationToken.None);
 
         // Act
@@ -456,7 +456,7 @@ public class DimProcessHandlerTests
         var (encryptSecret, initializationVector) = cryptoHelper.Encrypt("test123");
         var walletData = new WalletData("https://example.org/token", "cl1", encryptSecret, initializationVector, _settings.EncryptionConfigIndex);
         A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", "https://example.org/base", walletData, tenant.Did, tenant.DidDownloadUrl));
+            .Returns(("bpn123", Guid.NewGuid(), "https://example.org/base", walletData, tenant.Did, tenant.DidDownloadUrl));
 
         // Act
         var result = await _sut.SendCallback(_tenantId, CancellationToken.None);
