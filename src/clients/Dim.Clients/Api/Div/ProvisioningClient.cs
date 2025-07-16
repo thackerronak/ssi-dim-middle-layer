@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2024 BMW Group AG
+ * Copyright (c) 2025 BMW Group AG
  * Copyright 2024 SAP SE or an SAP affiliate company and ssi-dim-middle-layer contributors.
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -50,7 +50,7 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
                         Enumerable.Repeat(new ApplicationCompany(
                             companyName,
                             didDocumentLocation,
-                            [new ApplicationCompanyService("CredentialService", "https://dis-agent-prod.eu10.dim.cloud.sap/api/v1.0.0/iatp")],
+                            isIssuer ? ["dcp-issuer", "dcp-holder"] : ["dcp-holder"],
                             isIssuer ?
                                 [
                                     new("SIGNING"),
@@ -61,7 +61,17 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
                                     new("SIGNING")
                                 }
                         ), 1),
-                        Enumerable.Empty<TrustedIssuer>()
+                        isIssuer
+                        ? Enumerable.Empty<TrustedIssuer>()
+                        : new[]
+                        {
+                            new TrustedIssuer(
+                                _settings.IssuerName,
+                                _settings.IssuerDid,
+                                new[] { "BpnCredential", "MembershipCredential", "DataExchangeGovernanceCredential" },
+                                false
+                            )
+                        }
                     ), 1)
                 )
             )
@@ -139,7 +149,7 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
             new ServiceKeyCreationPayloadData(
                 walletId,
                 technicalUserName,
-                new ServiceKeyParameter(new[] { "IatpOperations", "ReadCompanyIdentity", "ResolveDID" })
+                new ServiceKeyParameter(new[] { "DcpOperations", "ReadCompanyIdentity", "ResolveDID" })
             )
         );
         var client = await basicAuthTokenService

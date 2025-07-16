@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2024 BMW Group AG
+ * Copyright (c) 2025 BMW Group AG
  * Copyright 2024 SAP SE or an SAP affiliate company and ssi-dim-middle-layer contributors.
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -27,4 +27,10 @@ public class ProvisioningSettings : BasicAuthSettings
 {
     [Required]
     public string BaseUrl { get; set; } = null!;
+
+    [Required]
+    public string IssuerDid { get; set; } = null!;
+
+    [Required]
+    public string IssuerName { get; set; } = null!;
 }
