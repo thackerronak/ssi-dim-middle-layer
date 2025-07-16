@@ -112,11 +112,12 @@ public class TenantRepository(DimDbContext dbContext)
                 )))
             .SingleOrDefaultAsync();
 
-    public Task<(string Bpn, string? BaseUrl, WalletData WalletData, string? Did, string? DownloadUrl)> GetCallbackData(Guid tenantId) =>
+    public Task<(string Bpn, Guid? CompanyId, string? BaseUrl, WalletData WalletData, string? Did, string? DownloadUrl)> GetCallbackData(Guid tenantId) =>
         dbContext.Tenants
             .Where(x => x.Id == tenantId)
-            .Select(x => new ValueTuple<string, string?, WalletData, string?, string?>(
+            .Select(x => new ValueTuple<string, Guid?, string?, WalletData, string?, string?>(
                 x.Bpn,
+                x.CompanyId,
                 x.BaseUrl,
                 new WalletData(
                     x.TokenAddress,

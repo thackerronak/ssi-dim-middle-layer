@@ -226,7 +226,7 @@ public class DimProcessHandler(
 
     public async Task<(IEnumerable<ProcessStepTypeId>? nextStepTypeIds, ProcessStepStatusId stepStatusId, bool modified, string? processMessage)> SendCallback(Guid tenantId, CancellationToken cancellationToken)
     {
-        var (bpn, baseUrl, walletData, did, downloadUrl) = await dimRepositories.GetInstance<ITenantRepository>().GetCallbackData(tenantId).ConfigureAwait(ConfigureAwaitOptions.None);
+        var (bpn, companyId, baseUrl, walletData, did, downloadUrl) = await dimRepositories.GetInstance<ITenantRepository>().GetCallbackData(tenantId).ConfigureAwait(ConfigureAwaitOptions.None);
         var (tokenAddress, clientId, clientSecret, initializationVector, encryptionMode) = walletData.ValidateData();
         if (baseUrl == null)
         {
@@ -243,12 +243,27 @@ public class DimProcessHandler(
             throw new UnexpectedConditionException("DownloadUrl must always be set");
         }
 
+        if (companyId == null)
+        {
+            throw new UnexpectedConditionException("CompanyId must not be null");
+        }
+
         var cryptoHelper = _settings.EncryptionConfigs.GetCryptoHelper(encryptionMode);
         var secret = cryptoHelper.Decrypt(clientSecret, initializationVector);
 
         var didDocument = await GetDidDocument(downloadUrl, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
         var uaa = new AuthenticationDetail(tokenAddress, clientId, secret);
         await callbackService.SendCallback(bpn, uaa, didDocument, did, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
+
+        var dimAuth = new BasicAuthSettings
+        {
+            TokenAddress = $"{tokenAddress}/oauth/token",
+            ClientId = clientId,
+            ClientSecret = secret
+        };
+        await dimClient
+            .UpdateCompanyStatus(dimAuth, baseUrl, companyId.Value, cancellationToken)
+            .ConfigureAwait(ConfigureAwaitOptions.None);
 
         return new ValueTuple<IEnumerable<ProcessStepTypeId>?, ProcessStepStatusId, bool, string?>(
             null,

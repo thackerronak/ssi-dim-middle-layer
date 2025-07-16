@@ -30,3 +30,8 @@ public record CompanyData(
     [property: JsonPropertyName("id")] Guid CompanyId,
     [property: JsonPropertyName("downloadURL")] string DownloadUrl
 );
+
+public record CompanyStatusResponse(
+    [property: JsonPropertyName("operation")] string Operation,
+    [property: JsonPropertyName("status")] string Status
+);

@@ -62,6 +62,34 @@ public class DimClient(IBasicAuthTokenService basicAuthTokenService)
         }
     }
 
+    public async Task<string> UpdateCompanyStatus(BasicAuthSettings dimAuth, string dimBaseUrl, Guid companyId, CancellationToken cancellationToken)
+    {
+        var client = await basicAuthTokenService.GetBasicAuthorizedClient<DimClient>(dimAuth, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
+        var result = await client.PatchAsync($"{dimBaseUrl}/api/v2.0.0/companyIdentities/{companyId}/status", null, cancellationToken)
+            .CatchingIntoServiceExceptionFor("update-company-status", HttpAsyncResponseMessageExtension.RecoverOptions.INFRASTRUCTURE,
+                async m =>
+                {
+                    var message = await m.Content.ReadAsStringAsync().ConfigureAwait(ConfigureAwaitOptions.None);
+                    return (false, message);
+                }).ConfigureAwait(false);
+        try
+        {
+            var response = await result.Content
+                .ReadFromJsonAsync<CompanyStatusResponse>(JsonSerializerExtensions.Options, cancellationToken)
+                .ConfigureAwait(ConfigureAwaitOptions.None);
+            if (response?.Status == null || response.Status != "successful")
+            {
+                throw new ServiceException("Company status update failed", true);
+            }
+
+            return response.Status;
+        }
+        catch (JsonException je)
+        {
+            throw new ServiceException(je.Message);
+        }
+    }
+
     public async Task<string> GetStatusList(BasicAuthSettings dimAuth, string dimBaseUrl, Guid companyId, StatusListType statusListType, CancellationToken cancellationToken)
     {
         var client = await basicAuthTokenService.GetBasicAuthorizedClient<DimClient>(dimAuth, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
