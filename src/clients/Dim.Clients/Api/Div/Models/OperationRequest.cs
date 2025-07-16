@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2024 BMW Group AG
+ * Copyright (c) 2025 BMW Group AG
  * Copyright 2024 SAP SE or an SAP affiliate company and ssi-dim-middle-layer contributors.
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -48,7 +48,7 @@ public record WalletApplication(
 public record ApplicationCompany(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("hostingURL")] string HostingUrl,
-    [property: JsonPropertyName("services")] IEnumerable<ApplicationCompanyService> Services,
+    [property: JsonPropertyName("protocols")] string[] Protocols,
     [property: JsonPropertyName("keys")] IEnumerable<ApplicationCompanyKey> Keys
 );
 
@@ -64,6 +64,7 @@ public record ApplicationCompanyKey(
 public record TrustedIssuer(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("did")] string Did,
+    [property: JsonPropertyName("credentialTypes")] string[] CredentialTypes,
     [property: JsonPropertyName("ignoreMissingHashlist")] bool IgnoreMissingHashlist
 );
 
