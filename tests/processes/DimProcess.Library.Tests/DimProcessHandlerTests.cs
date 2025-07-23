@@ -128,7 +128,7 @@ public class DimProcessHandlerTests
                 initialize?.Invoke(tenant);
                 modify(tenant);
             });
-        A.CallTo(() => _provisioningClient.CreateOperation(A<Guid>._, TenantName, A<string>._, A<string>._, A<string>._, A<bool>._, A<CancellationToken>._))
+        A.CallTo(() => _provisioningClient.CreateOperation(A<Guid>._, TenantName, A<string>._, A<string>._, A<string>._, A<bool>._, A<string>._, A<string>._, A<CancellationToken>._))
             .Returns(operationId);
 
         // Act

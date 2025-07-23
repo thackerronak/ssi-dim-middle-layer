@@ -54,6 +54,8 @@ processesworker:
     default: "Debug"
   dim:
     applicationName: "catena-x-portal"
+    IssuerDid: ""
+    IssuerName: ""
   provisioning:
     clientId: "<path:portal/data/dim/int/provisioning#clientId>"
     clientSecret: "<path:portal/data/dim/int/provisioning#clientSecret>"

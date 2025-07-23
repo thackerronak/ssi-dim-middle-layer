@@ -27,10 +27,4 @@ public class ProvisioningSettings : BasicAuthSettings
 {
     [Required]
     public string BaseUrl { get; set; } = null!;
-
-    [Required]
-    public string IssuerDid { get; set; } = null!;
-
-    [Required]
-    public string IssuerName { get; set; } = null!;
 }

@@ -35,7 +35,7 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
 {
     private readonly ProvisioningSettings _settings = options.Value;
 
-    public async Task<Guid> CreateOperation(Guid customerId, string customerName, string applicationName, string companyName, string didDocumentLocation, bool isIssuer, CancellationToken cancellationToken)
+    public async Task<Guid> CreateOperation(Guid customerId, string customerName, string applicationName, string companyName, string didDocumentLocation, bool isIssuer, string issuerDid, string issuerName, CancellationToken cancellationToken)
     {
         var data = new OperationCreationRequest(
             "provision",
@@ -66,8 +66,8 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
                         : new[]
                         {
                             new TrustedIssuer(
-                                _settings.IssuerName,
-                                _settings.IssuerDid,
+                                issuerName,
+                                issuerDid,
                                 new[] { "BpnCredential", "MembershipCredential", "DataExchangeGovernanceCredential" },
                                 false
                             )

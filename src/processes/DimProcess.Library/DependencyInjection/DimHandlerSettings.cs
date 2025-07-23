@@ -39,4 +39,10 @@ public class DimHandlerSettings
 
     [Required]
     public StatusListType StatusListType { get; set; }
+
+    [Required]
+    public string IssuerDid { get; set; } = null!;
+
+    [Required]
+    public string IssuerName { get; set; } = null!;
 }

@@ -56,7 +56,7 @@ public class DimProcessHandler(
             throw new UnexpectedConditionException("DidDocumentLocation must always be set");
         }
 
-        var operationId = await provisioningClient.CreateOperation(tenantId, tenantName, _settings.ApplicationName, tenantName, didDocumentLocation, isIssuer, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
+        var operationId = await provisioningClient.CreateOperation(tenantId, tenantName, _settings.ApplicationName, tenantName, didDocumentLocation, isIssuer, _settings.IssuerDid, _settings.IssuerName, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.None);
         tenantRepository.AttachAndModifyTenant(tenantId, t => t.OperationId = null, t => t.OperationId = operationId);
 
         return new ValueTuple<IEnumerable<ProcessStepTypeId>?, ProcessStepStatusId, bool, string?>(

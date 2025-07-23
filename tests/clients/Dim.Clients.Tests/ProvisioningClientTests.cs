@@ -86,7 +86,7 @@ public class ProvisioningClientTests
         // Arrange
         _fixture.ConfigureTokenServiceFixture<ProvisioningClient>(new HttpResponseMessage(HttpStatusCode.OK));
         var sut = _fixture.Create<ProvisioningClient>();
-        Task Act() => sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, CancellationToken.None);
+        Task Act() => sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, "did:web:example", "example", CancellationToken.None);
 
         // Act
         var ex = await Assert.ThrowsAsync<ServiceException>(Act);
@@ -101,7 +101,7 @@ public class ProvisioningClientTests
         // Arrange
         _fixture.ConfigureTokenServiceFixture<ProvisioningClient>(new HttpResponseMessage(HttpStatusCode.BadRequest));
         var sut = _fixture.Create<ProvisioningClient>();
-        Task Act() => sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, CancellationToken.None);
+        Task Act() => sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, "did:web:example", "example", CancellationToken.None);
 
         // Act
         var ex = await Assert.ThrowsAsync<ServiceException>(Act);
@@ -125,7 +125,7 @@ public class ProvisioningClientTests
         var sut = _fixture.Create<ProvisioningClient>();
 
         // Act
-        var result = await sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, CancellationToken.None);
+        var result = await sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, "did:web:example", "example", CancellationToken.None);
 
         // Assert
         result.Should().Be(operationId);
