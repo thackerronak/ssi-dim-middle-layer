@@ -245,7 +245,7 @@ public class DimProcessHandler(
 
         if (companyId == null)
         {
-            throw new UnexpectedConditionException("CompanyId must not be null");
+            throw new UnexpectedConditionException("CompanyId must always be set");
         }
 
         var cryptoHelper = _settings.EncryptionConfigs.GetCryptoHelper(encryptionMode);
