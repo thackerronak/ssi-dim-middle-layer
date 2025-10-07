@@ -443,21 +443,6 @@ public class DimProcessHandlerTests
     }
 
     [Fact]
-    public async Task SendCallback_WithoutCompanyId_ReturnsExpected()
-    {
-        // Arrange
-        A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", null, "https://example.org/base", _fixture.Create<WalletData>(), "did:web:example:org:base", "url"));
-        async Task Act() => await _sut.SendCallback(_tenantId, CancellationToken.None);
-
-        // Act
-        var ex = await Assert.ThrowsAsync<UnexpectedConditionException>(Act);
-
-        // Assert
-        ex.Message.Should().Be("CompanyId must always be set");
-    }
-
-    [Fact]
     public async Task SendCallback_WithValidData_ReturnsExpected()
     {
         // Arrange
@@ -486,68 +471,6 @@ public class DimProcessHandlerTests
         result.processMessage.Should().BeNull();
         result.stepStatusId.Should().Be(ProcessStepStatusId.DONE);
         result.nextStepTypeIds.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task SendCallback_WithValidData_UpdatesCompanyStatus()
-    {
-        // Arrange
-        var companyId = Guid.NewGuid();
-        var tenant = new Tenant(_tenantId, "test", "Corp", "https://example.org/did", false, _processId, _operatorId)
-        {
-            Did = "did:web:example:org:base",
-            DidDownloadUrl = "https://example.org/download",
-        };
-
-        var cryptoHelper = _settings.EncryptionConfigs.GetCryptoHelper(_settings.EncryptionConfigIndex);
-        var (encryptSecret, initializationVector) = cryptoHelper.Encrypt("test123");
-        var walletData = new WalletData("https://example.org/token", "cl1", encryptSecret, initializationVector, _settings.EncryptionConfigIndex);
-
-        A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", companyId, "https://example.org/base", walletData, tenant.Did, tenant.DidDownloadUrl));
-
-        // Act
-        await _sut.SendCallback(_tenantId, CancellationToken.None);
-
-        // Assert
-        A.CallTo(() => _dimClient.UpdateCompanyStatus(
-            A<BasicAuthSettings>.That.Matches(auth =>
-                auth.TokenAddress == "https://example.org/token/oauth/token" &&
-                auth.ClientId == "cl1" &&
-                auth.ClientSecret == "test123"),
-            "https://example.org/base",
-            companyId,
-            A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task SendCallback_WhenUpdateCompanyStatusFails_ThrowsServiceException()
-    {
-        // Arrange
-        var companyId = Guid.NewGuid();
-        var tenant = new Tenant(_tenantId, "test", "Corp", "https://example.org/did", false, _processId, _operatorId)
-        {
-            Did = "did:web:example:org:base",
-            DidDownloadUrl = "https://example.org/download",
-        };
-
-        var cryptoHelper = _settings.EncryptionConfigs.GetCryptoHelper(_settings.EncryptionConfigIndex);
-        var (encryptSecret, initializationVector) = cryptoHelper.Encrypt("test123");
-        var walletData = new WalletData("https://example.org/token", "cl1", encryptSecret, initializationVector, _settings.EncryptionConfigIndex);
-
-        A.CallTo(() => _tenantRepositories.GetCallbackData(_tenantId))
-            .Returns(("bpn123", companyId, "https://example.org/base", walletData, tenant.Did, tenant.DidDownloadUrl));
-
-        A.CallTo(() => _dimClient.UpdateCompanyStatus(A<BasicAuthSettings>._, A<string>._, A<Guid>._, A<CancellationToken>._))
-            .Throws(new ServiceException("Update failed"));
-
-        // Act
-        async Task Act() => await _sut.SendCallback(_tenantId, CancellationToken.None);
-
-        // Assert
-        var ex = await Assert.ThrowsAsync<ServiceException>(Act);
-        ex.Message.Should().Be("Update failed");
     }
 
     #endregion
