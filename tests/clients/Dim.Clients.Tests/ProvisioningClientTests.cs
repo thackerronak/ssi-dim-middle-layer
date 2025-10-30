@@ -131,6 +131,39 @@ public class ProvisioningClientTests
         result.Should().Be(operationId);
     }
 
+    [Fact]
+    public async Task CreateOperation_WithNonIssuer_ValidatesCredentialConfiguration()
+    {
+        // Arrange
+        var operationId = Guid.NewGuid();
+        var data = new OperationRequest(operationId);
+        var capturedRequestContent = string.Empty;
+
+        using (var responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(data, JsonSerializerExtensions.Options))
+        })
+        {
+            _fixture.ConfigureTokenServiceFixture<ProvisioningClient>(
+                responseMessage,
+                request => capturedRequestContent = request?.Content?.ReadAsStringAsync().Result ?? string.Empty);
+            var sut = _fixture.Create<ProvisioningClient>();
+
+            // Act
+            await sut.CreateOperation(Guid.NewGuid(), "corp", "application1", "test corp", "https://example.org/did", false, "did:web:example", "example", CancellationToken.None);
+        }
+
+        // Assert - Validate credential configuration
+        capturedRequestContent.Should().NotBeEmpty();
+        var request = JsonSerializer.Deserialize<OperationCreationRequest>(capturedRequestContent, JsonSerializerExtensions.Options);
+        var trustedIssuer = request!.Payload.WalletServiceParameter.Applications.First().TrustedIssuers.First();
+
+        trustedIssuer.CredentialTypeConfiguration.Should().HaveCount(3);
+        trustedIssuer.CredentialTypeConfiguration.Should().Contain(c => c.CredentialType == "BpnCredential" && c.AutoAcceptOffers);
+        trustedIssuer.CredentialTypeConfiguration.Should().Contain(c => c.CredentialType == "MembershipCredential" && c.AutoAcceptOffers);
+        trustedIssuer.CredentialTypeConfiguration.Should().Contain(c => c.CredentialType == "DataExchangeGovernanceCredential" && c.AutoAcceptOffers);
+    }
+
     #endregion
 
     #region CreateServiceKey

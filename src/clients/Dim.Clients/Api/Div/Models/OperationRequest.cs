@@ -64,8 +64,13 @@ public record ApplicationCompanyKey(
 public record TrustedIssuer(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("did")] string Did,
-    [property: JsonPropertyName("credentialTypes")] string[] CredentialTypes,
+    [property: JsonPropertyName("credentialTypeConfiguration")] IEnumerable<CredentialTypeConfiguration> CredentialTypeConfiguration,
     [property: JsonPropertyName("ignoreMissingHashlist")] bool IgnoreMissingHashlist
+);
+
+public record CredentialTypeConfiguration(
+    [property: JsonPropertyName("credentialType")] string CredentialType,
+    [property: JsonPropertyName("autoAcceptOffers")] bool AutoAcceptOffers
 );
 
 public record OperationRequest(

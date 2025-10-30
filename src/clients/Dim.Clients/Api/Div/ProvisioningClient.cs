@@ -68,7 +68,11 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
                             new TrustedIssuer(
                                 issuerName,
                                 issuerDid,
-                                new[] { "BpnCredential", "MembershipCredential", "DataExchangeGovernanceCredential" },
+                                [
+                                    new CredentialTypeConfiguration("BpnCredential", true),
+                                    new CredentialTypeConfiguration("MembershipCredential", true),
+                                    new CredentialTypeConfiguration("DataExchangeGovernanceCredential", true)
+                                ],
                                 false
                             )
                         }
@@ -149,7 +153,7 @@ public class ProvisioningClient(IBasicAuthTokenService basicAuthTokenService, IO
             new ServiceKeyCreationPayloadData(
                 walletId,
                 technicalUserName,
-                new ServiceKeyParameter(new[] { "DcpOperations", "ReadCompanyIdentity", "ResolveDID" })
+                new ServiceKeyParameter(new[] { "IatpOperations", "DcpOperations", "ReadCompanyIdentity", "ResolveDID" })
             )
         );
         var client = await basicAuthTokenService
